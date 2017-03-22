@@ -1,4 +1,4 @@
-#AMA 2004: Numerical Analysis - Project on Adaptive Quadrature Method
+# AMA 2004: Numerical Analysis - Project on Adaptive Quadrature Method
 
 
 
