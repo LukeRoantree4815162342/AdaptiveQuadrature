@@ -61,14 +61,6 @@ function [APP, eval_count, xpt, fx] = conor_adaptive(func_names, a, b, TOL, N)
                 end
         end
         
-    for n = 1:(length(xpt)-1)
-        for m = (n+1):(length(xpt)-1)
-            if xpt(n) > xpt(m)
-                xpt(n) = xpt(m);
-                fx(n) = fx(m);
-            end
-        end 
-    end
     [xnew, ind] = sort(xpt);
     ynew = fx(ind);
     xpt = xnew;
