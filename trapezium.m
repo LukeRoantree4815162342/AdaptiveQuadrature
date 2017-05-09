@@ -17,7 +17,6 @@ function [APP, eval_count, xpt, fx] = trapezium(func_name, a, b, TOL, N)
     end
     i = i + 1;
     h = h/2.0;
-    %APP1(i)
     num_traps = (2^(i))-1;
     APP1(i+1) = (h/2.0)*(func_name(a) + func_name(b));
     for j = 1:(num_traps - 1)
@@ -27,10 +26,8 @@ function [APP, eval_count, xpt, fx] = trapezium(func_name, a, b, TOL, N)
     iter = iter + 1;
   end
   APP = APP1(i+1);
-  for k = 1:(num_traps - 1)
-    xpt(k) = a+h*k;
-    fx(k) = func_name(xpt(k));
-  end
+  xpt = linspace(a,b,num_traps);
+  fx = func_name(xpt);
 end
   
     
