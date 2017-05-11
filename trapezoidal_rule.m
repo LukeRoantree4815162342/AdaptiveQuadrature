@@ -1,19 +1,14 @@
-function [APP, eval_count, xpt, fx] = trapezium(func_name, a, b, TOL, N)
+function [APP, eval_count, xpt, fx] = trapezoidal_rule(func_name, a, b, TOL, N)
   h = b-a;
   APP1 = (h/2.0)*(func_name(a) + func_name(b));  % one trapezium
   h = h/2.0;
   APP1(2) = (h/2.0)*(func_name(a) + func_name(b)) + h*func_name(a+h);   % two trapezia
   eval_count = 5;
-  i = 1;
-  iter = 0;
-  xpt = 0;
-  fx = 0;
-  num_traps = 0; 
-  APP = 0;
-  % Three above as scoping in matlab is weird
-  while abs(APP1(i+1) - APP1(i)) > TOL
+  i = 1; iter = 0; num_traps = 0; APP = 0;
+  while abs(APP1(i+1) - APP1(i)) > TOL  % continue until approximation accurate enough
     if iter >= N
-      disp("Max iteration exceeded")
+      disp("Max iteration exceeded");
+      break;
     end
     i = i + 1;
     h = h/2.0;

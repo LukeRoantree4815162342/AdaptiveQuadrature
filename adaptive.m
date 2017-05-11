@@ -1,70 +1,70 @@
-function APP = adaptive3(funcname, a, b, TOL, MAXINT)
-  %APP = feval(funcname,1234); %placeholder til function is built, use feval rather
-                               %than @ handle due to being messy in Octave
-                               
-  
-  APP = 0;
-  i = 1;
-  TOLi = [];
-  TOLi(1) = 10*TOL;
-  ai = [];
-  ai(1) = a;
-  hi = [];
-  hi(1) = ((b-a)*0.5); % Initial step size half of full width
-  
-  % Initial approximation Start
-  FAi = [];
-  FBi = [];
-  FCi = [];
-  Si = [];
-  Li = [];
-  FAi(1) = func_two(ai(end));
-  FBi(1) = func_two(b);
-  FCi(1) = func_two(ai(end)+hi(end));
-  Si(1) = hi(end) *(FAi(end) + 4*FCi(end) + FBi(end))*(1.0/3.0);
-  % Initial approximation End
-  Li(1) = 1;
-  
-  while(i>0)
-    FD = func_two((ai(i) +(hi(i)*0.5)));
-    FE = func_two((ai(i) + 3.0*(hi(i) *0.5)));
-    S1 = hi(i)*(1.0/6.0)*(FAi(i) + 4*FD + FCi(i));
-    S2 = hi(i)*(1.0/6.0)*(FCi(i) + 4*FE + FBi(i));
-    v1=ai(i) ; v2=FAi(i) ; v4=FBi(i) ; v3 =FCi(i) ; v5=hi(i) ; v6=TOLi(i) ; v7=Si(i) ; v8=Li(i) ;
+function [APP, eval_count, xpt, fx] = adaptive(func_names, a, b, TOL, N)  %#1
+    format long   %#2
+    eval_count = 0; i=1; APP = 0; 
     
+    TOL_mat(i) = 10*TOL;
+    h(i) = (b-a(i))/2;   
     
-    i = i-1;  % Remove current level
-    %disp(APP);
-    if (abs(S1+S2-v7)<v6)
-      APP = APP + (S1+S2);
-    else
-      if (v8>=MAXINT)
-        disp('shits fucked yo');
-        error('MAXINT exceeded without achieving tolerance');
-      else
-      
-        i = i+1;
+    FA = func_names(a(i));
+    FB = func_names(b);
+    FC = func_names(a(i) + h(i));
+    S = h(i)*(FA(i) + (4*FC(i)) + FB(i))/3; %#3
+    
+    iter = 1;
+    eval_count = eval_count + 3;
+    
+    xpt = b; xpt(eval_count-1) = a(i) + h(i); xpt(eval_count) = a(i); 
+    fx = FB; fx(eval_count-1) = FC; fx(eval_count) = FA;
+
+    while i>0
         
-        ai(i) = v1 + v5;
-        FAi(i) = v3;
-        FCi(i) = FE;
-        FBi(i) = v4;
-        hi(i) = v5*0.5;
-        TOLi(i) = v6*0.5;
-        Si(i) = S2;
-        Li(i) = v8 + 1;
+        FD = func_names(a(i)+(h(i)/2));
+        FE = func_names(a(i)+3*(h(i)/2));
+        S1 = h(i)*(FA(i)+4*FD + FC(i))/6; %#4a
+        S2 = h(i)*(FC(i) + 4*FE + FB(i))/6; %#4b
+        eval_count = eval_count + 2;
+        xpt(eval_count-1) = a(i)+(h(i)/2); xpt(eval_count) = a(i)+3*(h(i)/2);
+        fx(eval_count-1) = FD; fx(eval_count) = FE;
         
-        i = i+1;
+        v1 = a(i); v2 = FA(i); v3 = FB(i); v4 = FC(i); v5 = h(i); v6 = TOL_mat(i); v7 = S(i); v8 = iter(i);
+        i = i-1;
+           
+        if (abs(S2+S1-v7) < v6);  %#5
+            APP = APP + (S2 + S1); 
         
-        ai(i) = v1;
-        FAi(i) = v2;
-        FCi(i) = FD;
-        FBi(i) = v3;
-        hi(i) = hi(i-1);
-        TOLi(i) = TOLi(i-1);
-        Si(i) = S1;
-        Li(i) = Li(i-1);
-      end
+        else
+        
+            if v8 > N
+                disp('Level Exceeded');
+            break
+            
+            else  %#6
+                i=i+1; 
+                a(i) = v1 + v5; 
+                FA(i) = v4;
+                FC(i) = FE;
+                FB(i) = v3;
+                h(i) = v5/2;
+                TOL_mat(i)= v6/2;
+                S(i) = S2;
+                iter(i) = v8 + 1;
+                
+                i=i+1; 
+                a(i) = v1;
+                FA(i) = v2;
+                FC(i) = FD;
+                FB(i) = v4;
+                h(i) = h(i-1);
+                TOL_mat(i) = TOL_mat(i-1);
+                S(i) = S1;
+                iter(i) = iter(i-1);  
+            end
+        end
     end
-  end
+        
+    [xnew, ind] = sort(xpt);
+    ynew = fx(ind);
+    xpt = xnew;
+    fx = ynew;
 end
+
